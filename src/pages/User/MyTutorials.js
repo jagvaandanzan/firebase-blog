@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -11,7 +11,7 @@ export default function MyTutorials() {
   const navigate = useNavigate();
   useEffect(() => {
     const fetchPosts = async () => {
-      const q = query(collection(db, "posts"), where("authorId", "==", currentUser.uid));
+      const q = query(collection(db, "posts"), where("authorId", "==", currentUser.uid), orderBy("createdDate", "desc"));
       const res = await getDocs(q);
       setPostList(res.docs.map((item) => ({ ...item.data(), docId: item.id })));
     };

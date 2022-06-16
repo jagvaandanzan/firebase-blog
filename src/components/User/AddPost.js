@@ -1,15 +1,17 @@
 import React, { useState, useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { addDoc, collection, doc } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../firebase.config";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../App";
+import { useNavigate } from "react-router-dom";
 
 export default function AddPost() {
   const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("");
   const currentUser = useRecoilValue(currentUserState);
   const editorRef = useRef(null);
+  const navigate = useNavigate();
 
   const convertToSlug = (Text) => {
     return Text.toLowerCase()
@@ -24,17 +26,22 @@ export default function AddPost() {
   };
 
   const addPost = async () => {
-    const colRef = collection(db, "posts");
-    await addDoc(colRef, {
-      authorId: currentUser.uid,
-      authorName: currentUser.username,
-      postTitle: title,
-      postSlug: slug,
-      postText: editorRef.current.getContent(),
-      wordCount: editorRef.current.plugins.wordcount.getCount(),
-      approved: false,
-      createdDate: ""
-    });
+    try {
+      const colRef = collection(db, "posts");
+      await addDoc(colRef, {
+        authorId: currentUser.uid,
+        authorName: currentUser.username,
+        postTitle: title,
+        postSlug: slug,
+        postText: editorRef.current.getContent(),
+        wordCount: editorRef.current.plugins.wordcount.getCount(),
+        approved: false,
+        createdDate: ""
+      });
+      navigate("/myTutorials");
+    } catch (e) {
+      alert(e.message);
+    }
   };
 
   return (

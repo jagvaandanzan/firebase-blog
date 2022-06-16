@@ -9,6 +9,7 @@ import { db } from "../../firebase.config";
 export default function Post() {
   const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
   const [id, setId] = useState("");
   const { postSlug } = useParams();
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function Post() {
   const deletePost = async () => {
     const docRef = doc(db, "posts", id);
     await deleteDoc(docRef);
-    navigate("/myTutorials");
+    navigate("/");
   };
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function Post() {
         setSlug(postSlug);
         setId(item.id);
         editorRef.current.setContent(item.data().postText);
+        setText(item.data().postText);
       });
     };
     fetchPosts();

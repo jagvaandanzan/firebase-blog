@@ -41,7 +41,7 @@ export default function Posts() {
           className="rounded-2xl shadow max-w-xs flex flex-col py-5 px-10 space-y-4 hover:-translate-y-1 hover:shadow-lg hover:scale-110 transition ease-in-out delay-150  hover:cursor-pointer"
           onClick={() => {
             navigate(`/showPost/${item.data().postSlug}`);
-            setPostId(item.docId);
+            setPostId(item.id);
           }}>
           <h1 className="text-lg text-blue-500 font-bold uppercase">"Tutorial"</h1>
           <h1 className="text-2xl font-bold text-gray-800">{item.data().postTitle}</h1>
