@@ -31,6 +31,7 @@ export default function AddPost() {
       await addDoc(colRef, {
         authorId: currentUser.uid,
         authorName: currentUser.username,
+        blogCount: currentUser.blogCount + 1,
         postTitle: title,
         postSlug: slug,
         postText: editorRef.current.getContent(),

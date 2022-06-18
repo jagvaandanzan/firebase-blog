@@ -2,7 +2,7 @@ import { collection, deleteDoc, doc, getDocs, query } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { currentUserState } from "../../App";
-import { auth, db } from "../../firebase.config";
+import { db } from "../../firebase.config";
 import AddAdminModal, { saveState } from "./AddAdminModal";
 import ConfirmModal, { confirmState, showConfirmModalState } from "./ConfirmModal";
 
@@ -18,7 +18,6 @@ export default function AuthorLists() {
   const [showAddAdminModal, setShowAddAdminModal] = useRecoilState(showAddAdminModalState);
   const [showDeleteModal, setShowDeleteModal] = useRecoilState(showConfirmModalState);
   const currentUser = useRecoilValue(currentUserState);
-  const confirmed = useRecoilValue(confirmState);
 
   const deleteUser = async (item) => {
     try {

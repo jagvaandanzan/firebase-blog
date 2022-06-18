@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { currentUserState } from "../../App";
 import { Editor } from "@tinymce/tinymce-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, deleteDoc, doc, getDocs, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, increment, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../../firebase.config";
 
 export default function Post() {
@@ -11,6 +9,7 @@ export default function Post() {
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [id, setId] = useState("");
+  const [authorId, setAuthorId] = useState("");
   const { postSlug } = useParams();
   const navigate = useNavigate();
   const editorRef = useRef(null);
@@ -24,19 +23,33 @@ export default function Post() {
   const deletePost = async () => {
     const docRef = doc(db, "posts", id);
     await deleteDoc(docRef);
+    await updateDoc(doc(db, "users", authorId), {
+      blogCount: increment(-1)
+    });
     navigate("/");
+  };
+
+  const approvePost = async () => {
+    try {
+      const docRef = doc(db, "posts", id);
+      await updateDoc(docRef, {
+        approved: true,
+        createdDate: new Date().toLocaleDateString()
+      });
+      navigate("/");
+    } catch (e) {}
   };
 
   useEffect(() => {
     const fetchPosts = async () => {
       const q = query(collection(db, "posts"), where("postSlug", "==", postSlug));
       const res = await getDocs(q);
-      res.docs.map((item) => {
+      res.docs.forEach((item) => {
         setTitle(item.data().postTitle);
         setSlug(postSlug);
         setId(item.id);
-        editorRef.current.setContent(item.data().postText);
         setText(item.data().postText);
+        setAuthorId(item.data().authorId);
       });
     };
     fetchPosts();
@@ -78,6 +91,7 @@ export default function Post() {
         onInit={(evt, editor) => {
           editorRef.current = editor;
         }}
+        initialValue={text}
         apiKey="ehxzw9qhhnzjhypnjrfwnyx38pr5uaqb9chq3t7feiywda17"
         init={{
           height: 500,
@@ -110,7 +124,11 @@ export default function Post() {
         }}
       />
       <div className="flex space-x-4">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save</button>
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          onClick={approvePost}>
+          Save
+        </button>
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           onClick={deletePost}>
